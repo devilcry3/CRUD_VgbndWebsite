@@ -1,8 +1,32 @@
 {
+  "name": "brandonwilliams_crudwebsite_vagabond",
+  "version": "1.0.0",
+  "description": "Crud website I created in 285, uses Vagabond system",
+  "keywords": [
+    "vagabond",
+    "CRUD",
+    "crud"
+  ],
+  "homepage": "https://github.com/devilcry3/CRUD_VgbndWebsite#readme",
+  "bugs": {
+    "url": "https://github.com/devilcry3/CRUD_VgbndWebsite/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devilcry3/CRUD_VgbndWebsite.git"
+  },
+  "license": "ISC",
+  "author": "Brandon Williams",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "did I workedid"
+  },
   "dependencies": {
     "express": "^5.2.1",
     "express-validator": "^7.3.2",
-    "multer": "^2.1.1",
-    "mysql2": "^3.20.0"
+    "multer": "^2.4.0",
+    "mysql2": "^3.24.4",
+    "validator": "^13.15.35"
   }
 }
