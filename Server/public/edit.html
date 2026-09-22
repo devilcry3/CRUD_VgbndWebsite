@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Vagabond Character</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body class="creator editor">
+    <!--<button popovertarget="mypopover">Show the popover</button>-->
+        <div popover="auto" class="overlay" id="mypopover"></div> <!--https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/overlay popover info found here-->
+            <div class="skull"></div>
+
+
+            <!-- Error Banner -->
+            <div id="invalid-form" class="alert alert-danger d-none"></div>
+
+            <!-- Header -->
+            <div class="container">
+                <div class="parch row">
+                    <div class="col-md-12 text-center">
+                        <h1>Vagabond Character Editor</h1>
+                    </div>
+
+                    <div class="row">
+                        <div class="parchment col-md-3">
+                            <a href="index.html">Character Table</a>
+                        </div>
+                        <div class="parchment col-md-3">
+                            <a href="creator.html">Character Creation</a>
+                        </div>
+                        <div class="parchment col-md-3">
+                            <a href="#">Edit Character</a>
+                        </div>
+                        <div class="parchment col-md-3"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Editor -->
+            <div class="container mt-4">
+                <div class="card p-4 mb-4">
+                    <h2 class="text-center mb-4">Character Editor</h2>
+
+                    <div id="character-editor"></div>
+
+                    <div class="row mt-4">
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <button id="update-character" class="btn btn-success btn-lg w-100">
+                                    Update Character
+                                </button>
+                            </div>
+
+                            <div class="col-md-6">
+                                <button id="delete-character" class="btn btn-danger btn-lg w-100">
+                                    Delete Character
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+    <script>
+
+        // ==========================
+        // GLOBAL STATE
+        // ==========================
+        let DB_CLASS = {};
+        let DB_ANCESTRIES = {};
+        let DB_ARCHETYPES = {};
+        let currentStats = [];
+        let currentCharacter = null;
+        let changedFields = new Set(); // For tracking a change was made, used to for visual representations in form
+
+        const errorBanner = document.getElementById('invalid-form');
+
+        // ==========================
+        // FETCH HELPER
+        // ==========================
+        async function fetchJSON(url, options = {}) {
+            const response = await fetch(url, options);
+            const json = await response.json();
+            return { status: response.status, json };
+        }
+
+        // ==========================
+        // LOAD REFERENCE DATA
+        // ==========================
+        async function loadClasses() {
+            const { status, json } = await fetchJSON('/classes/');
+            if (status === 200) {
+                json.data.forEach(c => {
+                    DB_CLASS[c.id] = {
+                        name: c.class,
+                        role: c.role
+                    };
+                });
+            }
+        }
+
+        async function loadAncestries() {
+            const { status, json } = await fetchJSON('/ancestry/');
+            if (status === 200) {
+                json.data.forEach(a => {
+                    DB_ANCESTRIES[a.id] = {
+                        name: a.ancestry,
+                        type: a.ancestry_type
+                    };
+                });
+            }
+        }
+
+        async function loadArchetypes() {
+            const { status, json } = await fetchJSON('/archetypes/');
+            if (status === 200) {
+                json.data.forEach(ar => {
+                    DB_ARCHETYPES[ar.id] = {
+                        name: ar.archetype,
+                        gear: [
+                            ar.slot_1, ar.slot_2, ar.slot_3,
+                            ar.slot_4, ar.slot_5, ar.slot_6, ar.slot_7
+                        ].filter(Boolean),
+                        currency: `${ar.gold || 0}g ${ar.silver || 0}s ${ar.copper || 0}c`
+                    };
+                });
+            }
+        }
+
+        // ==========================
+        // LOAD CHARACTER BY ID
+        // ==========================
+        async function loadCharacter() {
+            const id = new URLSearchParams(window.location.search).get('id');
+
+            if (!id) {
+                errorBanner.classList.remove('d-none');
+                errorBanner.innerText = 'No character ID provided.';
+                return;
+            }
+
+            const { status, json } = await fetchJSON(`/characters/${id}`);
+
+            if (status === 200 && json.data.length > 0) {
+                currentCharacter = json.data[0];
+
+                currentStats = [
+                    currentCharacter.might,
+                    currentCharacter.dexterity,
+                    currentCharacter.awareness,
+                    currentCharacter.reason,
+                    currentCharacter.presence,
+                    currentCharacter.luck
+                ];
+
+                renderEditor();
+            }
+        }
+
+        // ==========================
+        // TABLE RENDERER
+        // ==========================
+        function buildOptions(dataObj, selectedId, formatter) {
+            let html = '';
+
+            for (const id in dataObj) {
+                html += `<option value="${id}" ${parseInt(id) === parseInt(selectedId) ? 'selected' : ''}>${formatter(dataObj[id])}</option>`;
+            }
+
+            return html;
+        }
+
+        function buildStatEditor() {
+            let statRows = '';
+
+            ABILITIES.forEach((ability, index) => {
+                statRows += `
+        <tr>
+            <td><div class = "head">${ability}</div></td>
+            <td>
+                <select class="form-select fill stat-dropdown ${changedFields.has(`stat-${index}`) ? 'changed' : ''}"
+                        data-index="${index}">
+                    ${currentStats.map(value => `
+                        <option value="${value}" ${value === currentStats[index] ? 'selected' : ''}>
+                            ${value}
+                        </option>
+                    `).join('')}
+                </select>
+            </td>
+        </tr>`;
+            });
+
+            return `
+        <h3 class="mt-4 b">Stats</h3>
+        <table class="table table-bordered">
+            <tr><th><div class="truhead">Ability</div></th><th><div class="truhead">Score</div></th></tr>
+            ${statRows}
+        </table>
+    `;
+        }
+
+
+
+        function renderEditor() {
+            const hp = currentStats[0] * currentCharacter.level;
+            const slots = 10 + currentStats[0];
+
+            document.getElementById('character-editor').innerHTML = `
+        <table class="table table-bordered">
+            <tr><th><div class="truhead">Field</div></th><th><div class="truhead">Value</div></th></tr>
+
+            <tr>
+                <td><div class = "head">ID</div></td>
+                <td class="fill">${currentCharacter.id}</td>
+            </tr>
+
+            <tr>
+                <td><div class = "head">Name</div></td>
+               <td>
+                    <input id="edit-name"
+                    data-track-change="true"
+                    class="form-control fill ${changedFields.has('edit-name') ? 'changed' : ''}"
+                    value="${currentCharacter.name || ''}"> </td>
+            </tr>
+
+            <tr>
+                <td><div class = "head">Level<div></td>
+                <td>
+                    <select id="edit-level" data-track-change="true" class="form-control ${changedFields.has('edit-level') ? 'changed' : ''}">
+                        <option class="fill" value="1" ${currentCharacter.level == 1 ? 'selected' : ''}>1</option>
+                        <option class="fill" value="2" ${currentCharacter.level == 2 ? 'selected' : ''}>2</option>
+                        <option class="fill" value="3" ${currentCharacter.level == 3 ? 'selected' : ''}>3</option>
+                    </select>
+                </td>
+            </tr>
+
+            <tr>
+                <td><div class = "head">Ancestry</div></td>
+                <td>
+                    <select id="edit-ancestry" data-track-change="true" class="fill form-control ${changedFields.has('edit-ancestry') ? 'changed' : ''}">
+                        ${buildOptions(DB_ANCESTRIES, currentCharacter.ancestry_id, a => `${a.name} | TYPE: ${a.type}`)}
+                    </select>
+                </td>
+            </tr>
+
+            <tr>
+                <td><div class = "head">Class</div></td>
+                <td>
+                    <select id="edit-class" data-track-change="true" class="fill form-control ${changedFields.has('edit-classe') ? 'changed' : ''}>
+                        ${buildOptions(DB_CLASS, currentCharacter.class_id, c => `${c.name} | ROLE: ${c.role}`)}
+                    </select>
+                </td>
+            </tr>
+
+            <tr>
+                <td><div class = "head">Archetype</div></td>
+                <td>
+                    <select id="edit-archetype" data-track-change="true" class="fill form-control ${changedFields.has('edit-archetype') ? 'changed' : ''}>
+                        ${buildOptions(DB_ARCHETYPES, currentCharacter.archetype_id, ar => ar.name)}
+                    </select>
+                </td>
+            </tr>
+
+            <tr>
+                <td><div class = "head">Perk</div></td>
+                <td><input id="edit-perk" data-track-change="true" class="fill form-control ${changedFields.has('edit-perk') ? 'changed' : ''}" value="${currentCharacter.perk || ''}"></td>
+            </tr>
+
+            <tr>
+                <td><div class = "head">Image</div></td>
+                <td>
+                    <input type="file" id="edit-file" data-track-change="true" class="fill form-control ${changedFields.has('edit-file') ? 'changed' : ''}>
+                    <input type="hidden" id="current-image" value="${currentCharacter.image_name || ''}">
+                    <small>Current: ${currentCharacter.image_name || 'None'}</small>
+                </td>
+            </tr>
+
+            <tr>
+                <td><div class = "head">Stat Array Preset</div></td>
+                <td>
+                    <select id="stat-array-select" data-track-change="true" class="fill form-select ${changedFields.has('stat-array-select') ? 'changed' : ''}">
+                        <option  value="6,6,5,3,2,2">6,6,5,3,2,2</option>
+                        <option  value="5,5,5,4,3,2">5,5,5,4,3,2</option>
+                        <option  value="7,6,4,3,2,2">7,6,4,3,2,2</option>
+                        <option  value="6,5,5,4,2,2">6,5,5,4,2,2</option>
+                        <option value="6,6,4,4,3,2">6,6,4,4,3,2</option>
+                        <option  value="5,5,4,4,3,3">5,5,4,4,3,3</option>
+                    </select>
+                </td>
+            </tr>
+
+            <tr>
+                <td><div class = "head">HP</div></td>
+                <td class="fill">${hp}</td>
+            </tr>
+
+            <tr>
+                <td><div class = "head">Item Slots</div></td>
+                <td class="fill">${slots}</td>
+            </tr>
+        </table>
+
+        ${buildStatEditor()}
+    `;
+        }
+
+        // ==========================
+        // STAT SWAP LOGIC
+        // ==========================
+        document.addEventListener('input', function (e) {
+            if (e.target.dataset.trackChange === "true") {
+                changedFields.add(e.target.id);
+                e.target.classList.add('changed');
+            }
+
+            if (
+                e.target.id === 'edit-name' ||
+                e.target.id === 'edit-perk'
+            ) {
+                syncCurrentCharacterFromForm();
+            }
+        });
+
+        document.addEventListener('change', function (e) {
+            if (e.target.dataset.trackChange === "true") {
+                changedFields.add(e.target.id);
+                e.target.classList.add('changed');
+            }
+
+            if (
+                e.target.id === 'edit-level' ||
+                e.target.id === 'edit-ancestry' ||
+                e.target.id === 'edit-class' ||
+                e.target.id === 'edit-archetype' ||
+                e.target.id === 'edit-file' ||
+                e.target.id === 'stat-array-select'
+            ) {
+                syncCurrentCharacterFromForm();
+            }
+
+            // ==========================
+            // Stat dropdown swap logic
+            // ==========================
+            if (e.target.classList.contains('stat-dropdown')) {
+                const index = parseInt(e.target.dataset.index);
+                const newValue = parseInt(e.target.value);
+                const oldValue = currentStats[index];
+
+                const swapIndex = currentStats.findIndex((v, i) => v === newValue && i !== index);
+
+                if (swapIndex !== -1) {
+                    currentStats[swapIndex] = oldValue;
+                }
+
+                currentStats[index] = newValue;
+
+                changedFields.add(`stat-${index}`);
+
+                renderEditor();
+            }
+
+            // ==========================
+            // Stat array preset logic
+            // ==========================
+            if (e.target.id === 'stat-array-select') {
+                const selectedClassId = document.getElementById('edit-class').value;
+                const className = DB_CLASS[selectedClassId].name;
+
+                const newArray = e.target.value.split(',').map(Number);
+                currentStats = assignStatsByClass(newArray, className);
+
+                renderEditor();
+            }
+        });
+        function syncCurrentCharacterFromForm() { //keeps track of what changes where made and updates currentcharacter info
+            const nameField = document.getElementById('edit-name'); //fixing a name display issue caused by this
+            if (!nameField) return;
+
+            if (nameField.value.trim() !== '') {
+                currentCharacter.name = nameField.value;
+            }
+
+            currentCharacter.level = parseInt(document.getElementById('edit-level').value);
+            currentCharacter.ancestry_id = parseInt(document.getElementById('edit-ancestry').value);
+            currentCharacter.class_id = parseInt(document.getElementById('edit-class').value);
+            currentCharacter.archetype_id = parseInt(document.getElementById('edit-archetype').value);
+            currentCharacter.perk = document.getElementById('edit-perk').value;
+        }
+        function assignStatsByClass(statArray, charClass) {
+            const sorted = [...statArray].sort((a, b) => b - a);
+
+            const priority =
+                CLASS_STAT_PRIORITY?.[charClass] ??
+                CLASS_STAT_PRIORITY?.["Default"];
+
+            if (!Array.isArray(priority)) {
+                console.error("Invalid CLASS_STAT_PRIORITY for:", charClass);
+                return statArray;
+            }
+
+            const map = {};
+            priority.forEach((ability, index) => {
+                map[ability] = sorted[index];
+            });
+
+            return ABILITIES.map(a => map[a] ?? 0);
+        }
+
+        // ==========================
+        // UPDATE SUBMISSION
+        // ==========================
+        async function updateCharacter() {
+            const id = currentCharacter.id;
+
+            const formData = new FormData();
+
+            const level = parseInt(document.getElementById('edit-level').value);
+            const hp = currentStats[0] * level;
+
+            formData.append('id', id);
+            formData.append('name', document.getElementById('edit-name').value);
+            formData.append('level', level);
+            formData.append('hp', hp);
+            formData.append('ancestry', document.getElementById('edit-ancestry').value);
+            formData.append('class', document.getElementById('edit-class').value);
+            formData.append('archetype', document.getElementById('edit-archetype').value);
+            formData.append('perk', document.getElementById('edit-perk').value);
+            formData.append('stats', currentStats.join(','));
+            formData.append('currentImage', document.getElementById('current-image').value);
+
+            const fileInput = document.getElementById('edit-file');
+            if (fileInput.files[0]) {
+                formData.append('filename', fileInput.files[0]);
+            }
+
+            const response = await fetch(`/edit/${id}`, {
+                method: 'PUT',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            errorBanner.classList.remove('d-none', 'alert-danger');
+
+            if (response.status === 200) {
+                errorBanner.classList.add('alert-success');
+                errorBanner.innerText = 'Character updated successfully!';
+            } else {
+                errorBanner.classList.add('alert-danger');
+                errorBanner.innerText = result.message || 'Update failed.';
+            }
+        }
+
+        document.getElementById('update-character')
+            .addEventListener('click', updateCharacter);
+
+        // ==========================
+        // INITIALIZE PAGE
+        // ==========================
+        (async function init() {
+            await Promise.all([
+                loadClasses(),
+                loadAncestries(),
+                loadArchetypes()
+            ]);
+
+            await loadCharacter();
+        })();
+
+        async function deleteCharacter() {
+            const confirmed = confirm(
+                `Are you sure you want to permanently delete ${currentCharacter.name}?`
+            );
+
+            if (!confirmed) return;
+
+            const response = await fetch(`/delete/${currentCharacter.id}`, {
+                method: 'DELETE'
+            });
+
+            const result = await response.json();
+
+            const body = document.body;
+            const popover = document.getElementById("mypopover");
+
+
+            errorBanner.classList.remove('d-none', 'alert-danger');
+
+            if (response.status === 200) {
+                errorBanner.classList.add('alert-success');
+                errorBanner.innerText = 'Character deleted successfully!';
+                body.classList.remove("creator");
+                body.classList.add("removed");
+                setTimeout(() => {
+                   popover.showPopover(); //turns the popover on after a quarter second
+                }, 325);
+                
+
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 2350);
+
+            } else {
+                errorBanner.classList.add('alert-danger');
+                errorBanner.innerText = result.message || 'Delete failed.';
+
+            }
+        }
+
+        document.getElementById('delete-character')
+            .addEventListener('click', deleteCharacter);
+
+    </script>
+</body>
+
+</html>

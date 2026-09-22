@@ -1,0 +1,394 @@
+/*--------------------------------------------------------------
+----------------------------------------------------------------
+General use
+---------------------------------------------------------------
+---------------------------------------------------------------
+*/
+
+h3.b, h4.b{
+   font-weight: bold; 
+}
+td.i{
+    font-style: italic;
+}
+
+ a {
+  
+  font-family: "Copperplate Gothic", "Copperplate", fantasy;
+  display: flex;
+  
+}
+ a:link {
+ color: rgb(235, 83, 1);
+ text-align: center;
+ font-size: 1.6em;
+}
+a:hover {
+  color: rgb(255, 0, 179);
+}
+
+a:active {
+  color: rgb(255, 8, 86);
+}
+
+a:visited {
+  color: rgb(156, 67, 19);
+}
+
+a:visited:hover {
+  color: rgb(134, 55, 110);
+}
+
+
+
+
+/*--------------------------------------------------------------
+----------------------------------------------------------------
+Index.html specific
+---------------------------------------------------------------
+---------------------------------------------------------------
+*/
+.tab table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tab th, .tab td {
+    border: 1px solid #ccc; /* vertical + horizontal lines */
+    padding: 8px;
+    text-align: center;
+}
+.tab td.row1{
+    background-color: beige;
+}
+
+.tab td.row2{
+    background-color: rgb(189, 249, 252);
+}
+
+.tab th {
+    background-color: #fd8739;
+}
+
+.tab tbody tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+.tab .table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+body.tab{
+    background-color: rgb(223, 185, 134);
+
+    /* Archetype tray row styling */
+.archetype-tray-row {
+    display: none; /* hidden by default */
+    background-color: #eef; /* light highlight */
+}
+
+.archetype-tray {
+  
+    font-size: 0.95em;
+         max-width: 500px;
+    margin: 0 auto;
+    text-align: left;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+
+/* Toggle button in archetype cell */
+.toggle-archetype-btn {
+    margin-left: 6px;
+    padding: 2px 6px;
+    font-size: 0.85em;
+    cursor: pointer;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+   .archetype-tray {
+        font-size: 0.85em;
+        white-space: normal;
+    }
+
+     .toggle-archetype-btn {
+        padding: 4px 8px;
+        font-size: 0.9em;
+    }
+}
+}
+
+
+/*--------------------------------------------------------------
+----------------------------------------------------------------
+Character Creation document
+---------------------------------------------------------------
+---------------------------------------------------------------
+*/
+
+.creator div.parch {
+  background-color: #ab7d3d;
+  font-family: "Copperplate Gothic", "Copperplate", fantasy;
+  background: #dea24e;
+  
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  padding: 2rem;
+  border-radius: 10px;
+}
+
+.creator .parchment {
+  background: rgba(229, 189, 118, 0.9);
+  border: 1px solid #e6c36b;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  padding: 2rem;
+}
+
+
+
+body.creator {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background: #ab7d3d ; 
+}
+.creator .container {
+    display: flex;
+    gap: 20px;
+}
+
+.creator #invalid-form.alert-success {
+    background-color: #33f49d ;
+    color: #0f5132 ;
+    border-color: #badbcc ;
+}
+
+.creator #invalid-form {
+    display: block;
+    background-color: #f8d7da ;
+    color: #842029 ;
+    border-color: #f5c2c7 ;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    width: 100%;
+    text-align: center;
+}
+
+.creator .card .row > .col-12.text-danger {
+   background-color: #f8d7da;
+   /* Bootstrap alert-danger red */
+   color: #842029;
+   border-color: #f5c2c7;
+   padding: 1rem;
+   margin-bottom: 1rem;
+   width: 100%;
+   text-align: center;
+}
+/* Scoped headers */
+.creator h1 {
+    text-align: center;
+    font-weight: bold;
+    text-decoration: underline;
+    font-style: italic;
+}
+
+.creator h2 {
+    font-weight: bold;
+}
+
+/* Scoped Cards - Bootstrap .card usually needs !important to change BG */
+.creator .card {
+    background: #dea24e ;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    flex: 1;
+}
+
+.creator label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+/* Scoped Inputs & Selects */
+.creator select,
+input {
+    width: 100%;
+    padding: 6px;
+    margin-top: 5px;
+}
+
+/* Scoped Buttons */
+.creator button:not(.btn) {
+    background: #333;
+    color: white;
+}
+.creator button {
+    margin-top: 15px;
+    padding: 10px;
+    width: 100%;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.creator .btn-secondary {
+    background: #bf61b1 ;
+    color: white ;
+}
+
+.creator button:hover {
+    background: #555 ;
+}
+
+/* Scoped Tables */
+.creator table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    /*background-color: white; /* Optional: Makes the table readable on the orange card */
+}
+
+.creator th,
+.creator td {
+    border: 1px solid #ccc ;
+    padding: 8px;
+    text-align: left;
+}
+
+.creator th {
+    background: #eee ;
+    color: #333;
+}
+/*112*/
+
+.removed{
+    background-color: #0c0000 ;
+    
+}
+
+/*--------------------------------------------------------------
+----------------------------------------------------------------
+Character Edit document
+---------------------------------------------------------------
+---------------------------------------------------------------
+*/
+
+.changed{
+    background-color: rgb(255, 240, 104);
+    outline: 2px solid orange;
+    font-style: italic;
+    transition: 0.5s ease;
+}
+
+body.editor{ /*stolen from my portfolio website*/
+     color: #348127;
+  background: radial-gradient(circle, rgb(223, 185, 134) 0%, #000000 100%);
+  border-radius: 20px;
+  /* rounded corners */
+  padding: 20px;
+  box-shadow: 0 0 20px rgba(231, 108, 1, 0.568),
+    /* subtle glow */
+    inset 0 0 10px rgba(255, 255, 255, 0.05);
+  /* inner highlight */
+}
+.table .head{
+    font-style:oblique;
+    font-size: 21px;
+    padding-top: 6px;
+     display: flex;
+  justify-content: center;
+  align-items: center;
+ font-weight: bold; 
+}
+.table .truhead{
+    
+    font-size: 28px;
+    padding-top: 6px;
+     display: flex;
+  justify-content: center;
+  align-items: center;
+ font-weight: bold; 
+}
+.table h4.b{
+    font-weight: bold; 
+}
+.table .fill{
+    font-size: 18px;
+}
+
+    html {
+  font-family: "Helvetica", "Arial", sans-serif;
+}
+
+
+/*--------------------------------------------------------------
+----------------------------------------------------------------
+Popover Kit
+---------------------------------------------------------------
+---------------------------------------------------------------
+*/
+
+[popover]:popover-open {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+[popover] {
+  width: 500px;
+  height: 500px;
+  max-width: 90vw;
+  max-height: 90vh;
+
+  font-size: 1.2rem;
+  padding: 10px;
+
+  background-image: url("./old-script/JurrasicHack_Skull.gif");
+  background-size: contain;     /* or cover */
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: transparent;
+
+  opacity: 0;
+
+  transition:
+    opacity 0.7s,
+    transform 0.7s,
+    overlay 0.7s allow-discrete,
+    display 0.7s allow-discrete;
+}
+
+/* Needs to be included after the previous [popover]:popover-open
+   rule to take effect, as the specificity is the same */
+@starting-style {
+  [popover]:popover-open {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+}
+
+/* Transition for the popover's backdrop */
+
+[popover]::backdrop {
+  background-color: transparent;
+  transition:
+    display 0.7s allow-discrete,
+    overlay 0.7s allow-discrete,
+    background-color 0.7s;
+  /* Equivalent to
+  transition: all 0.7s allow-discrete; */
+}
+
+[popover]:popover-open::backdrop {
+  background-color: rgb(0 0 0 / 25%);
+}
+
+/* Nesting selectors (&) cannot represent pseudo-elements, so this 
+   starting-style rule cannot be nested. */
+
+@starting-style {
+  [popover]:popover-open::backdrop {
+    background-color: transparent;
+  }
+}

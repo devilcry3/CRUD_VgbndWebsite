@@ -1,0 +1,235 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Spring 2025 Course Schedule</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body class="tab">
+    <h1>Vagabond Custom Characters</h1>
+    <div class="container">
+        <div class="parch row">
+
+            <div class=" row">
+                <div class="parchment col-md-3">
+                    <a href="index.html">Character Table</a>
+                </div>
+                <div class="parchment col-md-3">
+                    <a href="creator.html">Character Creation </a>
+                </div>
+                <div class="parchment col-md-3"></div>
+                <div class="parchment col-md-3"></div>
+            </div>
+
+        </div>
+    </div>
+    <hr />
+
+    <div class="container">
+
+        <div class='row mb-3'>
+            <div class='col-md-2'>
+                <label class="fw-bold">Ancestry/Race of Character</label>
+            </div>
+            <div class='col-md-10'>
+                <select id='ancestry'>
+                    <option value=''>Select Ancestry</option>
+                    <option value='1'>Halfing</option>
+                    <option value='2'>Elf</option>
+                    <option value='3'>Human</option>
+                    <option value='4'>Dwarf</option>
+                    <option value='5'>Goblin</option>
+                </select>
+            </div>
+        </div>
+
+        <div class='row mb-3'>
+            <div class='col-md-2'>
+                <label class="fw-bold">Character Name</label>
+            </div>
+            <div class='col-md-10'>
+                <input id='name' type='text' />
+            </div>
+        </div>
+
+        <div class='row mb-3'>
+            <div class='col-md-2'>
+                <label class="fw-bold">Sort By Character Level</label>
+            </div>
+            <div class='col-md-10'>
+                <select id='sort'>
+                    <option value=''></option>
+                    <option value='ASC'>Ascending</option>
+                    <option value='DESC'>Descending</option>
+                </select>
+            </div>
+        </div>
+        <div class='row mb-3'>
+            <div class='col-md-2'>
+                <label class="fw-bold">Listed Limit</label>
+            </div>
+            <div class='col-md-10'>
+                <input type="text" id="rowLimit" placeholder="Enter number of rows">
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-12">
+                <p class=" fw-bold">Show Ancestry/Class/Archetype names? <input type="checkbox" id="names"
+                        name="id_name" value="TRUE" checked></p>
+            </div>
+        </div>
+
+        <div class='row mb-3'>
+            <div class='col-md-12'>
+                <button id='search'>Search for Classes</button>
+            </div>
+        </div>
+
+    </div>
+
+    <hr />
+
+    <div id='classes' class='overflow'>
+        Courses go here.
+    </div>
+
+    <script>
+        const isEmpty = (obj) => Object.keys(obj).length === 0;
+
+        document.getElementById('search').addEventListener('click', (event) => {
+            const getParameters = {};
+
+            // Collect input values
+            if (document.getElementById('name').value.length !== 0) {
+                getParameters.name = document.getElementById('name').value;
+            }
+            if (document.getElementById('ancestry').value.length !== 0) {
+                getParameters.ancestry = document.getElementById('ancestry').value;
+            }
+            if (document.getElementById('sort').value.length !== 0) {
+                getParameters.sort = document.getElementById('sort').value;
+            }
+            if (document.getElementById('rowLimit').value.length !== 0) {
+                getParameters.rowLimit = parseInt(document.getElementById('rowLimit').value);
+            }
+
+            // New: Checkbox for showing names
+            const showNamesCheckbox = document.getElementById('names');
+            if (showNamesCheckbox.checked) {
+                getParameters.reveal = "TRUE";  // same as before, just simpler
+            }
+
+            //Settings for FETCH API request
+            let fetchSettings = {
+                method: 'GET'
+            };
+
+            // Send FETCH API request
+            fetch("http://localhost/characters/" + (!isEmpty(getParameters) ? '?' + new URLSearchParams(getParameters) : ''), fetchSettings)
+                .then((response) => {
+                    return new Promise((resolve) => response.json()
+                        .then((json) => resolve({
+                            status: response.status,
+                            json,
+                        })
+                        ));
+                })
+                // Logic to display errors on form
+                .then(({ status, json }) => {
+                    if (status === 200) {
+                        let displayTable = '<div class="table-container"><table>' +
+                            '<thead>' +
+                            '<tr>' +
+                            '<th class="d-md-table-cell" width="40%">Action</th>' +
+                            '<th class="d-md-table-cell" width="40%">Name</th>' +
+                            '<th class="d-md-table-cell" width="40%">Ancestry</th>' +
+                            '<th class="d-md-table-cell" width="40%">Level</th>' +
+                            '<th class="d-md-table-cell" width="33%">Class</th>' +
+                            '<th class="d-md-table-cell" width="33%">Archetype</th>' +
+                            '<th class="d-md-table-cell" width="33%">Might Score</th>' +
+                            '<th class="d-md-table-cell" width="33%">Dex Score</th>' +
+                            '<th class="d-md-table-cell" width="33%">Awareness Score</th>' +
+                            '<th class="d-md-table-cell" width="33%">Reason Score</th>' +
+                            '<th class="d-md-table-cell" width="33%">Presence Score</th>' +
+                            '<th class="d-md-table-cell" width="33%">Luck Score</th>' +
+                            '<th class="d-md-table-cell" width="33%">Image Name</th>' +
+                            '<th class="d-md-table-cell" width="33%">Perk Name</th>' +
+                            '</tr>' +
+                            '</thead>' +
+                            '<tbody>';
+
+                        if (typeof json.data !== 'undefined') {
+                            for (row of json.data) {
+                                // Build main row
+                                displayTable += '<tr>' +
+                                    '<td class="row1 text-center d-md-table-cell">' +
+                                    `<a href="edit.html?id=${row.id}" class="btn btn-sm btn-warning">Edit</a>` + '</td>' +
+                                    '<td class="row1 text-center d-md-table-cell">' + row.name + '</td>' +
+                                    '<td class="row2 text-center d-md-table-cell">' + (row.ancestry_name || row.ancestry_id) + '</td>' +
+                                    '<td class="row1 text-center d-md-table-cell">' + row.level + '</td>' +
+                                    '<td class="row2 text-center d-md-table-cell">' + (row.class_name || row.class_id) + '</td>' +
+                                    //the (row.class_name || row.clas_id) works with select statement in index.js. it selects based on priority
+                                    //so if the association to row.class_name has content sent from select it shows that over the id information.
+
+                                    '<td class="row1 text-center d-md-table-cell archetype-cell">' + (row.archetype_name || row.archetype_id) +
+                                    // Add toggle button for archetype tray only if show names checked
+                                    (showNamesCheckbox.checked ? ` <div><button class="toggle-archetype-btn" onclick="toggleArchetypeTray('tray-${row.id}')">+
+                                </button></div>` : '') + '</td>' +
+
+                                    '<td class="row2 text-center d-md-table-cell">' + row.might + '</td>' +
+                                    '<td class="row1 text-center d-md-table-cell">' + row.dexterity + '</td>' +
+                                    '<td class="row2 text-center d-md-table-cell">' + row.awareness + '</td>' +
+                                    '<td class="row1 text-center d-md-table-cell">' + row.reason + '</td>' +
+                                    '<td class="row2 text-center d-md-table-cell">' + row.presence + '</td>' +
+                                    '<td class="row1 text-center d-md-table-cell">' + row.luck + '</td>' +
+                                    '<td class="row2 text-center d-md-table-cell">' + row.image_name + '</td>' +
+                                    '<td class="row1 text-center d-md-table-cell">' + row.perk + '</td>' +
+                                    '</tr>';
+
+                                // Add hidden archetype tray row
+                                if (showNamesCheckbox.checked) {
+                                    displayTable += `<tr id="tray-${row.id}" class="archetype-tray-row">
+                                <td colspan="13">
+                                    <div class="archetype-tray">
+                                        <strong>Ancestry Type:</strong> ${row.ancestry_type || '-'} <br>
+                                        <strong>Combat Role:</strong> ${row.role || '-'}  <br>
+                                        <strong>Slots:</strong> ${row.slot_1 || '-'} | ${row.slot_2 || '-'} | ${row.slot_3 || '-'} | ${row.slot_4 || '-'} | ${row.slot_5 || '-'} | ${row.slot_6 || '-'} | ${row.slot_7 || '-'}<br>
+                                        <strong>Currency:</strong> ${row.gold || 0}g ${row.silver || 0}s ${row.copper || 0}c
+                                    </div>
+                                </td>
+                            </tr>`;
+                                }
+                            }
+                        }
+
+                        displayTable += '</tbody></table></div>';
+                        document.getElementById('classes').innerHTML = displayTable;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+
+        // Function to toggle archetype tray
+        function toggleArchetypeTray(id) {
+            const row = document.getElementById(id);
+            if (!row) return;
+
+            if (row.style.display === 'table-row') {
+                row.style.display = 'none';
+            } else {
+                row.style.display = 'table-row';
+            }
+        }
+    </script>
+</body>
+
+</html>
