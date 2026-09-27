@@ -259,7 +259,7 @@
             <tr>
                 <td><div class = "head">Class</div></td>
                 <td>
-                    <select id="edit-class" data-track-change="true" class="fill form-control ${changedFields.has('edit-classe') ? 'changed' : ''}>
+                    <select id="edit-class" data-track-change="true" class="fill form-control ${changedFields.has('edit-classe') ? 'changed' : ''}">
                         ${buildOptions(DB_CLASS, currentCharacter.class_id, c => `${c.name} | ROLE: ${c.role}`)}
                     </select>
                 </td>
@@ -268,7 +268,7 @@
             <tr>
                 <td><div class = "head">Archetype</div></td>
                 <td>
-                    <select id="edit-archetype" data-track-change="true" class="fill form-control ${changedFields.has('edit-archetype') ? 'changed' : ''}>
+                    <select id="edit-archetype" data-track-change="true" class="fill form-control ${changedFields.has('edit-archetype') ? 'changed' : ''}">
                         ${buildOptions(DB_ARCHETYPES, currentCharacter.archetype_id, ar => ar.name)}
                     </select>
                 </td>
@@ -282,7 +282,7 @@
             <tr>
                 <td><div class = "head">Image</div></td>
                 <td>
-                    <input type="file" id="edit-file" data-track-change="true" class="fill form-control ${changedFields.has('edit-file') ? 'changed' : ''}>
+                    <input type="file" id="edit-file" data-track-change="true" class="fill form-control ${changedFields.has('edit-file') ? 'changed' : ''}">
                     <input type="hidden" id="current-image" value="${currentCharacter.image_name || ''}">
                     <small>Current: ${currentCharacter.image_name || 'None'}</small>
                 </td>
@@ -439,7 +439,7 @@
             formData.append('archetype', document.getElementById('edit-archetype').value);
             formData.append('perk', document.getElementById('edit-perk').value);
             formData.append('stats', currentStats.join(','));
-            formData.append('currentImage', document.getElementById('current-image').value);
+            fformData.append('currentImage', currentCharacter.image_name || '');
 
             const fileInput = document.getElementById('edit-file');
             if (fileInput.files[0]) {
