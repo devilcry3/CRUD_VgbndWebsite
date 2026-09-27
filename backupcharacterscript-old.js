@@ -64,7 +64,7 @@
         //-------------------------------------------------
 
         let DB_CLASS = {};
-        fetch("http://localhost/classes/", { method: 'GET' })
+        fetch("/classes/", { method: 'GET' })
             .then((response) => {
                 return new Promise((resolve) => response.json()
                     .then((json) => resolve({
@@ -92,7 +92,7 @@
             });
 
         let DB_ANCESTRIES = {};
-        fetch("http://localhost/ancestry/", { method: 'GET' })
+        fetch("/ancestry/", { method: 'GET' })
             .then((response) => {
                 return new Promise((resolve) => response.json()
                     .then((json) => resolve({
@@ -122,7 +122,7 @@
         let DB_ARCHETYPES = {};
 
         function loadArchetypes() {
-            fetch("http://localhost/archetypes/", { method: 'GET' })
+            fetch("/archetypes/", { method: 'GET' })
                 .then(response => response.json())
                 .then(json => {
 

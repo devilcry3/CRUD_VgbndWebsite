@@ -132,7 +132,7 @@
             };
 
             // Send FETCH API request
-            fetch("http://localhost/characters/" + (!isEmpty(getParameters) ? '?' + new URLSearchParams(getParameters) : ''), fetchSettings)
+            fetch("/characters/" + (!isEmpty(getParameters) ? '?' + new URLSearchParams(getParameters) : ''), fetchSettings)
                 .then((response) => {
                     return new Promise((resolve) => response.json()
                         .then((json) => resolve({

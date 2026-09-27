@@ -22,5 +22,5 @@ app.use('/edit', edit);
 app.use('/delete', remove);
 
 app.listen(port, () => {
-    console.log(`Application listening at http://localhost:${port}`);
+    console.log(`Application listening at ${port}`);
 });
