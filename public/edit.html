@@ -439,7 +439,7 @@
             formData.append('archetype', document.getElementById('edit-archetype').value);
             formData.append('perk', document.getElementById('edit-perk').value);
             formData.append('stats', currentStats.join(','));
-            fformData.append('currentImage', currentCharacter.image_name || '');
+            formData.append('currentImage', currentCharacter.image_name || '');
 
             const fileInput = document.getElementById('edit-file');
             if (fileInput.files[0]) {
