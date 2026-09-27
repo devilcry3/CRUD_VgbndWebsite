@@ -3,7 +3,8 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static('public'));
+//stylesheet
+app.use(express.static(__dirname + '/public'));
 
 //Core node.js server page, uses routes and calls app usage from other route .js files
 
