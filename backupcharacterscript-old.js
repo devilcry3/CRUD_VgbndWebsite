@@ -532,7 +532,7 @@
                 formData.append('filename', fileField.files[0]);
             }
 
-            fetch("http://localhost:80/", { method: 'POST', body: formData })
+            fetch("/", { method: 'POST', body: formData })
                 .then(response => {
                     if (response.status === 400) {
                         return response.json().then(json => ({
