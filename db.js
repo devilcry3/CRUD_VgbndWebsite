@@ -2,10 +2,11 @@ const mysql = require('mysql2/promise');
 //Mysql database information and password
 
 const pool = mysql.createPool({
-    host: "student-databases.cvode4s4cwrc.us-west-2.rds.amazonaws.com",
-    user: "BRANDONWILLIAMS40",
-    password: "dAdOQ6xNTO2PoF3cPyl1RAz7SFKLbJrq7E5",
-    database: "BRANDONWILLIAMS40"
+    host: "crudabondtables.cnmi82ki8tut.us-east-2.rds.amazonaws.com",
+    user: "admin",
+    password: process.env.DB_PASSWORD,
+    database: "crudabond_database",
+    port: 3306
 });
 
 module.exports = pool;
