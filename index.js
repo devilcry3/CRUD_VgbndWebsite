@@ -14,7 +14,7 @@ const insert = require('./routes/insert');
 const data = require('./routes/referencedata');
 const edit = require('./routes/edit');
 const remove = require('./routes/delete');
-const port = 80;
+const port = 8080;
 
 app.use('/characters', characters);
 app.use('/insert', insert);
